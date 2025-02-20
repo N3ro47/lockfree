@@ -1,0 +1,48 @@
+[nero@HandyBeast lockfree]$ g++ -O2 -o main main.cpp
+[nero@HandyBeast lockfree]$ time ./main
+finished writing
+finished consuming
+150000000
+150000000
+Test passed: lockfreeQueue maintains order and integrity.
+
+real    6m33.581s
+user    11m2.324s
+sys     28m58.349s
+[nero@HandyBeast lockfree]$ g++ -std=c++23 -O2 -o main main.cpp
+[nero@HandyBeast lockfree]$ time ./main
+finished writing
+finished consuming
+150000000
+150000000
+Test passed: SpinlockAtomicQueue maintains order and integrity.
+
+real    0m48.487s
+user    6m21.740s
+sys     0m0.464s
+[nero@HandyBeast lockfree]$ echo 4_prodeucent
+4_prodeucent
+[nero@HandyBeast lockfree]$ rm main
+[nero@HandyBeast lockfree]$ g++ -std=c++23 -O2 -o main main.cpp
+[nero@HandyBeast lockfree]$ time ./main
+finished writing
+finished consuming
+40000000
+40000000
+Test passed: SpinlockAtomicQueue maintains order and integrity.
+
+real    0m8.318s
+user    0m37.463s
+sys     0m0.413s
+
+[nero@HandyBeast lockfree]$ g++ -std=c++17 -O2 -o main main.cpp
+[nero@HandyBeast lockfree]$ time ./main
+finished writing
+finished consuming
+40000000
+40000000
+Test passed: lockfreeQueue maintains order and integrity.
+
+real    1m3.497s
+user    1m53.273s
+sys     2m8.846s

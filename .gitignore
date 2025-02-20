@@ -1,0 +1,35 @@
+# Ignore build artifacts
+/build/
+/bin/
+/obj/
+*.o
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+
+# Ignore dependency files
+*.d
+*.dep
+
+# Ignore editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# Ignore generated files
+CMakeCache.txt
+CMakeFiles/
+Makefile
+compile_commands.json
+
+# Ignore logs and temp files
+*.log
+*.tmp
+*.pid
+
+//this is lib
+main.cpp
