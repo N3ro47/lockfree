@@ -1,5 +1,5 @@
-#ifndef ATOMIC_SPINLOCK_QUEUE
-#define ATOMIC_SPINLOCK_QUEUE
+#ifndef MOS_SPINLOCK_QUEUE
+#define MOS_SPINLOCK_QUEUE
 
 #include "spinlock.hpp"
 
@@ -13,12 +13,12 @@ struct Node {
 };
 
 template <typename T>
-class AtomicSpinlockQueue {
+class SpinlockQueue {
 private:
     Node<T>* head_;
     Node<T>* tail_;
     spinlock h_lock_; // head node lock
-    spinlock t_lock_; // head node lock
+    spinlock t_lock_; // tail node lock
 
     void initialize() {
         Node<T>* node = new Node<T>(); // allocate initial node
@@ -26,25 +26,21 @@ private:
     }
 
 public:
-    AtomicSpinlockQueue() {
+    SpinlockQueue() {
         initialize(); // Initialize in constructor
     }
 
-    ~AtomicSpinlockQueue() {
+    ~SpinlockQueue() {
         Node<T>* current = head_;
         while (current != nullptr) {
             Node<T>* next = current->next;
-            if constexpr (std::is_pointer<T>::value) {
-                // If T is a pointer, delete the object pointed to by value
-                delete current->value;
-            }
             delete current;
             current = next;
         }
     }
 
-    AtomicSpinlockQueue(const AtomicSpinlockQueue&) = delete;
-    AtomicSpinlockQueue& operator=(const AtomicSpinlockQueue&) = delete;
+    SpinlockQueue(const SpinlockQueue&) = delete;
+    SpinlockQueue& operator=(const SpinlockQueue&) = delete;
 
     void enqueue(const T value) {
         Node<T>* node = new Node<T>(value); // Allocate a new node
@@ -55,7 +51,7 @@ public:
         t_lock_.unlock(); // Release T lock
     }
 
-    bool dequeue(T* pvalue) {
+    bool dequeue(T& value) {
         h_lock_.lock(); // Acquire head lock
         Node<T>* node = head_; // read Head
         Node<T>* new_head = node->next; // Read next pointer
@@ -65,11 +61,8 @@ public:
             return false; // Queue was empty
         }
 
-        if (pvalue != nullptr) {
-            *pvalue = new_head->value; // Queue not empty. Read value
-        }
-
-        head_ = new_head;     // Swing Head to next node
+        value = new_head->value; // Copy value to output parameter
+        head_ = new_head;     // swing head
         h_lock_.unlock();     // Release head lock
 
         delete node; // Free old head node (dummy or actual first node)
@@ -77,4 +70,4 @@ public:
     }
 };
 
-#endif //ATOMIC_SPINLOCK_QUEUE
+#endif // MOS_SPINLOCK_QUEUE
