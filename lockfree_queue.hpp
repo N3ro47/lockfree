@@ -47,30 +47,28 @@ public:
         {
             last = tail_.load(std::memory_order_acquire);
             auto next = last->next.load(std::memory_order_acquire);
-            auto current_tail = tail_.load(std::memory_order_acquire);
-            if (last == current_tail)
+            auto current_tail = tail_.load(std::memory_order_relaxed); // Relaxed: Best-effort check; CAS ensures correctness on retry.
+            if (last != current_tail) continue;
+            if (!next)
             {
-                if (!next)
-                {
-                    auto expected_next = next;
-                    if (last->next.compare_exchange_weak(expected_next, new_node, 
-                                                         std::memory_order_acq_rel, 
-                                                         std::memory_order_acquire))
-                    {
-                        auto expected_tail = last;
-                        tail_.compare_exchange_strong(expected_tail, new_node, 
-                                                      std::memory_order_release, 
-                                                      std::memory_order_relaxed);
-                        break;
-                    }
-                }
-                else
+                auto expected_next = next;
+                if (last->next.compare_exchange_weak(expected_next, new_node, 
+                                                        std::memory_order_acq_rel, 
+                                                        std::memory_order_acquire))
                 {
                     auto expected_tail = last;
-                    tail_.compare_exchange_strong(expected_tail, next, 
-                                                  std::memory_order_release, 
-                                                  std::memory_order_relaxed);
+                    tail_.compare_exchange_strong(expected_tail, new_node, 
+                                                    std::memory_order_release, 
+                                                    std::memory_order_relaxed);
+                    break;
                 }
+            }
+            else
+            {
+                auto expected_tail = last;
+                tail_.compare_exchange_strong(expected_tail, next, 
+                                                std::memory_order_release, 
+                                                std::memory_order_relaxed);
             }
         }
     }
