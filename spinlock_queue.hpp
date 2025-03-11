@@ -2,6 +2,9 @@
 #define MOS_SPINLOCK_QUEUE
 
 #include "spinlock.hpp"
+#include <cstddef>
+
+constexpr std::size_t CACHE_LINE_SIZE = std::hardware_destructive_interference_size;
 
 template <typename T>
 struct Node {
@@ -17,8 +20,8 @@ class SpinlockQueue {
 private:
     Node<T>* head_;
     Node<T>* tail_;
-    spinlock h_lock_; // head node lock
-    spinlock t_lock_; // tail node lock
+    alignas(CACHE_LINE_SIZE) spinlock h_lock_; // head node lock
+    alignas(CACHE_LINE_SIZE) spinlock t_lock_; // tail node lock
 
     void initialize() {
         Node<T>* node = new Node<T>(); // allocate initial node
