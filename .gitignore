@@ -31,5 +31,3 @@ compile_commands.json
 *.tmp
 *.pid
 
-//this is lib
-main.cpp
