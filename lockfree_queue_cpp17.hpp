@@ -14,8 +14,8 @@ private:
         Node() : next(nullptr) {}
     };
 
-    std::shared_ptr<Node<T>> head_;
-    std::shared_ptr<Node<T>> tail_;
+    std::shared_ptr<Node> head_;
+    std::shared_ptr<Node> tail_;
 
 public:
     LockFreeQueue() {
@@ -29,7 +29,7 @@ public:
     LockFreeQueue(const LockFreeQueue &) = delete;
     LockFreeQueue &operator=(const LockFreeQueue &) = delete;
 
-    void enqueue(cosnt T value) {
+    void enqueue(const T value) {
         auto new_node = std::make_shared<Node>(value);
         std::shared_ptr<Node> last;
         while (true) {
